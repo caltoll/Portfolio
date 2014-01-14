@@ -1,255 +1,161 @@
 //ticTac.cpp
 //game of tic tac toe from command line 
-//Restructrued to be class based
+//Goal: Separate game implementation and board implementation. No board method should
+//print to the command line.
+
+
 
 #include <iostream>
+#include <string>
+#include "board.h"
 
 using namespace std;
 
-//Really I need to strip everything out
-//I can hack a class-based implementation together but really I should 
-//Take everything out 
-//Split into 2 files: For game and for board. Lets me use 
-
-//NEED
-//Board class
-
-//Game class? 
-
-class board
+class game
 {
-
 public:
-	board();
-	~board(){};
+	game();
+	
 
-	bool checkVictory(); //Check if the board is in a victory state & set getVictor											
-	void printBoard(); // Print the board with characters separated by | and _
-	bool makeMove(char place);
-	char getVictor(){return *victor;}
-	void resetBoard();
+	void playerTurn(char player);
+	void gameTurn();
+	void resetGame();
+	int playerInput();
 
-private: 
-	bool testArray(char array[3]); //As part of checkVictory: Test if an array of 3 characters are all equal
-	char * victor; //Char which shows which made the winning move, set via pointer through checkVictory
-	char boardArray[3][3];
+	bool isOver(){return gameOver;}
+	char getVictor(){return victor;}
+        string getStatus();
+
+private:
+	int turnNumber;
+	bool gameOver;
+	char victor;
+	board gameBoard;
+        
 };
 
-
-board::board()
+game::game()
 {
-	cout << "Board constructor call\n Initialising array with values: ";
+	turnNumber = 0;
+	gameOver = false;
+	victor = '\0';
+	
 
-	for (int i = 0; i<10; i++)  
-		{
-			int row = i/3;
-			int collumn = i%3;
-			int val = i+1;
-			char cVal = '0' + val;
-			cout << cVal << " ";
-			boardArray[row][collumn] = cVal;
-		}
-	cout << "\nConstructor complete\n";
+}
+
+void game::resetGame()
+{
+	turnNumber = 0;
+	gameOver = false;
+	victor = '\0';
+	gameBoard.resetBoard();
+	gameBoard.printBoard();
 }
 
 
-//=================================CHECKVICTORY=================================
-bool board::checkVictory()
+
+void game::gameTurn()
 {
-	char testR[3];//TestRow
-	char testC[3];//TestCollumn
-	char testD1[3];
-	char testD2[3];
-	//loop rows
-	for (int i = 0; i<3; i++)
+	if (!gameOver)
+		playerTurn('O');
+
+	if ( turnNumber == 9) 
 	{
-		for (int j = 0; j<3; j++)
-		{
-			testR[j] = boardArray[i][j];
-			testC[j] = boardArray[j][i];
-
-		
-
-		}
-
-		testD1[i] = boardArray[i][i];
-		testD2[i] = boardArray[i][2-i];
-
-		if(board::testArray(testR))
-		{
-			cout<<"\tRow Complete"<<endl;
-			return true; 
-		}
-
-		if(board::testArray(testC))
-		{	
-			cout<<"\tColumn Complete"<<endl;
-			return true;
-		}
-
-		if(board::testArray(testD1))
-		{
-			cout << "\tDiagonal Complete" << endl;
-			return true;
-		}
-
-		if(board::testArray(testD2))
-		{
-			cout << "\tDiagonal Complete" << endl;
-			return true;
-		}
-	
+		gameOver = true;
+		return;
 	}
 
-	
-	return false;
+	if (!gameOver)
+		playerTurn('X');
 }
 
-bool board::testArray(char array[3])
+string game::getStatus()
 {
-	if(array[0]==array[1] && array[1]==array[2])
-		return true;
-
-	return false;
+    string temp = gameBoard.getStatus();
+    return temp;
 }
 
-bool board::makeMove(char piece)//Needs to change to take int, move logic to game methods
+void game::playerTurn(char player)
 {
-	int r,c;
+	turnNumber++;
+
+	if(player == 'O')
+		cout << "Nought: ";
+	else if (player == 'X')
+		cout << "Cross: ";
+	int move = playerInput();
+
+	while (!gameBoard.makeMove(player, move))
+	{cout << "Invalid move, make another";}
+
+	if (gameBoard.checkVictory())
+		{
+			gameOver = true;
+			victor = gameBoard.getVictor();
+		}
+
+	gameBoard.printBoard();
+
+}
+
+int game::playerInput()
+{
 	int move;
-	if (!(cin >> move) || move > 9) //Check that its a valid integer
+	while(!(cin >> move) || move > 8) //Check that its a valid integer
 	{
 		cout << "\nEnter a valid square to move to: ";
 	
 		cin.clear();
 		cin.ignore();
-		return false;
-
 	}
-	
-	move--; //Array measured from 0
-	r = move/3;
-	c = move%3;
-	if((boardArray[r][c] == 'X')||(boardArray[r][c] == 'O'))
-	{
-		cout << "\nThat space is already taken, enter another: ";
-		return false;
-	}
-	
-		//Int/3 always rounds down, 
-	boardArray[r][c] = piece;
-	printBoard();
-	return true;
-}
 
-//==============Print Board Function====================
-void board::printBoard()
-{
-	cout << "\n\n";
-	for (int i = 0; i < 5; i++)
-	{
-		cout << "\t\t";
-		for (int j = 0; j < 5; j++)
-		{
-			//EVEN rows & colums print i/2,j/2
-			if ( (i % 2 == 0) && (j % 2 == 0))
-				cout << boardArray[i/2][j/2];
-
-			//EVEN row & ODD colum print |
-			else if ((i % 2 == 0) && !(j % 2 == 0))
-				cout << " | ";
-
-			//ODD row & EVEN colum print _
-			else if (!(i % 2 == 0) && (j % 2 == 0))
-				cout << "__";
-
-			//ODD row & ODD colum print |_
-			else
-				cout << "|_";
-		}
-
-		cout <<" \n";
-	}
-}
-
-
-
-
-
-//Eventually move this to a separate file
-
-void turn()
-{
-
+	return move;
 }
 
 //=================================MAIN=================================
 int main()
 {
 	cout 	<<"\n\n\t==================================== \n"
-			<<"\t Noughts and Crosses (1986 version) \n" 
+			<<"\t Noughts and Crosses \n" 
 			<<" \t====================================\n"
 			<<"\n\n\t *For two players \n\n\t *Enter the number shown on the square you want"
 			<<"\n\n\t *Continue taking turns until one or the other completes\n\t  a row, a column or a diagonal"
 			<<"\n\n\n\t\t--Press enter to start a game--"
 			<< endl;
 
-			cin.ignore();
+	cin.ignore();
+
+	game thisGame = game();
+
 	while(true)
 	{	
-		board gameBoard = board();
-		cout << "Back to main" << endl;
 		
-		char cont = '\0'; //Char will be set to y or n
-		char victory = '\0'; //Char will be set to X or O
-	
-		int move;
-		int turn = 0;
+		thisGame.resetGame();
 
-		gameBoard.printBoard();
-		
-		
-		
-		while(true)
+		while(!thisGame.isOver()) //two segments : GAME and TURN
 		{
-
-			//Nought's Turn
-			turn++;
-			cout << "\n\tNought: ";
-			while(!gameBoard.makeMove( 'O'))
-			{}
-
-			if(gameBoard.checkVictory())
-			{
-				victory = 'O';
-				break;
-			}
-
-			if(turn==9) //Awkward, but this loop has to stop after 9 turns
-				break;
-
-			//Cross' Turn
-			turn++;
-			cout << "\n\tCross: ";
-			while(!gameBoard.makeMove('X'))
-			{}
-
-			if(gameBoard.checkVictory())
-			{
-				victory = 'X';
-				break;
-			}
+			thisGame.gameTurn();
 		}
 		
-		cout << "\n\t *****Game Over*****"<<endl;
-		if(victory=='O')
+		
+		char cont = '\0';
+
+
+		cout << "\n\t" << thisGame.getStatus() << "\n\n\t *****Game Over*****"<<endl;
+
+		if(thisGame.getVictor() =='O')
 		{
 			cout << "\n\t Nought is the winner!"<<endl;
 		}
 
-		if(victory=='X')
+		else if(thisGame.getVictor() =='X')
 		{
 			cout << "\n\t Cross is the winner! "<<endl;
+		}
+
+		else 
+		{
+			cout << "Tie game!";
 		}
 
 		cout << "\n\tWould you like another game?" << endl;
@@ -266,9 +172,8 @@ int main()
 	} 
 
 	cout << "\tGoodbye" << endl;
-	return 0;
-
 	
+        return 0;
 }
 
 
