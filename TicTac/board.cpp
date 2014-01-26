@@ -17,7 +17,7 @@ using std::endl;
 board::board()
 {
 	victor = '\0';
-	cout << "Board constructor call";//Debug
+	//cout << "Board constructor call";//Debug
 
 	for (int i = 0; i<10; i++)  
 		{
@@ -28,15 +28,15 @@ board::board()
 			
 			boardArray[row][collumn] = cVal;
 		}
-	cout << "\nConstructor complete\n";//Debug
+	//cout << "\nConstructor complete\n";//Debug
 }
 
 board board::operator=(const board& rhs)
 {
-	cout << "= operator called" << endl;
+	//cout << "= operator called" << endl;//DEBUG
 	victor=rhs.getVictor();
 	status=rhs.getStatus();
-	cout << "Assigned victor and status, starting game board" << endl;
+	//cout << "Assigned victor and status, starting game board" << endl;//DEBUG
 
 	for (int i=0;i<3;i++)
 	{
@@ -47,7 +47,7 @@ board board::operator=(const board& rhs)
 			boardArray[i][j]=rhs.boardArray[i][j];
 		}
 	}
-	cout << "done" << endl;
+	//cout << "done" << endl;//DEBUG
 	return *this;
 }
 
@@ -60,7 +60,7 @@ board board::operator=(const board& rhs)
 
 bool board::checkVictory()
 {
-	cout << "Testing board for victory" << endl;
+	//cout << "Testing board for victory" << endl;//DEBUG
 	char testR[3];//TestRow
 	char testC[3];//TestCollumn
 	char testD1[3];
@@ -106,7 +106,7 @@ bool board::checkVictory()
 	
 	}
 
-	cout << "No victor" << endl;
+	//cout << "No victor" << endl;//DEBUG
 	return false;
 }
 
@@ -137,7 +137,7 @@ bool board::testArray(char array[3])
 
 bool board::makeMove(char piece, int move)//Needs to change to take int, move logic to game methods
 {
-	cout << "Move player " << piece << " to position " << move << endl;
+	//cout << "Move player " << piece << " to position " << move << endl;//DEBUG
     if (move>8)
         return false;
 
@@ -147,7 +147,7 @@ bool board::makeMove(char piece, int move)//Needs to change to take int, move lo
     c = move%3;
     if((boardArray[r][c] == 'X')||(boardArray[r][c] == 'O'))
     {
-            cout << " Failed\n";//DEBUG
+          //  cout << " Failed\n";//DEBUG
             return false;
             
     }
@@ -155,7 +155,7 @@ bool board::makeMove(char piece, int move)//Needs to change to take int, move lo
             //Int/3 always rounds down, 
     boardArray[r][c] = piece;
 
-    cout << "Success\n";//DEBUG
+   // cout << "Success\n";//DEBUG
     return true;
 }
 
@@ -165,7 +165,7 @@ bool board::makeMove(char piece, int move)//Needs to change to take int, move lo
 void board::resetBoard()
 {
 	victor = '\0';
-	cout << "RESET"<<endl;//DEBUG
+	//cout << "RESET"<<endl;//DEBUG
 
 	for (int i = 0; i<10; i++)  
 	{
