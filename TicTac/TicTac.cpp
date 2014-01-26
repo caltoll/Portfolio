@@ -83,10 +83,18 @@ void game::playerTurn(char player)
 		cout << "Nought: ";
 	else if (player == 'X')
 		cout << "Cross: ";
-	int move = playerInput();
+	
+	int move=-1;
 
-	while (!gameBoard.makeMove(player, move))
-	{cout << "Invalid move, make another";}
+	do
+	{
+		if (move != -1)
+			cout << "Invalid move, make another: ";
+		move = playerInput();
+
+	}
+	while (!gameBoard.makeMove(player, move));
+	
 
 	if (gameBoard.checkVictory())
 		{
@@ -100,6 +108,7 @@ void game::playerTurn(char player)
 
 int game::playerInput()
 {
+	//Clear the buffer just in case
 	int move;
 	while(!(cin >> move) || move > 8) //Check that its a valid integer
 	{
